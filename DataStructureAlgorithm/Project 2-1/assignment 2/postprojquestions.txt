@@ -1,0 +1,5 @@
+1: mostly, the bugs came down to how i normalized the positions. that was the cause of a lot of headaches.
+2: The biggest bug, which is one that I was not able to fix (Even with external assistance) was that of the append method being thrown out of whack with offsets. I tried a lot to try and fix it, but a lot of the time, I got either null values in the displayed array, or arrayindexoutofbounds exceptions.
+3: W3schools, GeeksforGeeks,and Grok helped me with some of the conceptualization and pseudocode for the project. especially the shuffler. 
+4: No. I didn't even get append to work correctly haha. 
+5: I have learned that I should have visited you during office hours again. 

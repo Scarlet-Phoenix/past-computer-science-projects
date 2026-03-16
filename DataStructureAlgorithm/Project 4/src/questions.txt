@@ -1,0 +1,5 @@
+1: Not many. Most of my bugs were caused by using a literal comparison '==' instead of the .equalTo method, which was fixed easily. So was the whole types specification
+2: w3 schools and geeks for geeks. 
+3: Not much. 
+4: i wanted to include more analysis methods, but I ran out of time.
+5: I have no significant feedback.

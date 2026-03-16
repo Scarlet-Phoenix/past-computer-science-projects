@@ -1,0 +1,75 @@
+public LargeInt add() (LargeInt other)
+     * 
+     * CREATE ArrayList<INTEGER> "totalsum" AS AN ArrayList<INTEGER>:
+     * CREATE boolean equalSize ASSIGN this.digits(size) == other.numDigits()
+     * CREATE long maxiterations ASSIGN this.digits.size() >= other.numDigits() ?
+     * other.numDigits() : this.digits.size()
+     * 
+     * CREATE int sum
+     * CREATE int carry
+     * 
+     * 
+     * FOR int = 0 UNTIL i < maxiterations AND INCREMENTING i BY 1:
+     * sum ASSIGN digits.get(i) + other.getDigitAt(i) + carry
+     * carry ASSIGN (int)Math.floor(digits / 10);
+     * sum ASSIGN sum MODULUS 10
+     * totalsum.add(sum)
+     * END
+     * 
+     * IF equalsize THEN
+     * RETURN LargeInt(totalsum)
+     * END
+     * 
+     * IF this.digits(size) > other.numDigits() THEN
+     * FOR int i = maxIterations UNTIL i < other.numDigits() AND INCREMENTING i by
+     * !:
+     * sum ASSIGN other.getDigitAt(i) + carry
+     * carry ASSIGN (int)Math.floor(digits / 10);
+     * sum ASSIGN sum MODULUS 10
+     * totalsum.add(sum)
+     * END
+     * 
+     * ELSE:
+     * FOR int i = maxIterations UNTIL i < digits.size() AND INCREMENTING i by !:
+     * sum ASSIGN digits.get(i) + carry
+     * carry ASSIGN (int)Math.floor(digits / 10);
+     * sum ASSIGN sum MODULUS 10
+     * totalsum.add(sum)
+     * END
+     * END
+     * RETURN LargeInt(totalsum)
+
+
+      PUBLIC LargeInt subtraction (L)
+     * CREATE ArrayList<INTEGER> result
+     * CREATE ArrayList<INTEGER> digitstemp = this.digits; 
+     * CREATE ArrayList<INTEGER> othertemp = other.getArrayList() 
+     * CREATE INTEGER dig1 
+     * CREATE INTEGER dig2
+     * CREATE INTEGER borrow ASSIGN 0
+     * CREATE INTEGER maxiterations ASSIGN this.digits.size() >= other.numDigits() ? this.digits.size() : -1;
+     * IF maxiterations == -1 THEN
+     *  THROW NEW EXCEPTION ILLEGALARGUMENTEXCEPTION("negative numbers are not supported.")
+     * IF (this.compareTo(other) == 0) THEN
+     *  return NEW LARGEINT("0")  
+     * end
+     *  WHILE otherstemp.size() < maxiterations DO
+     *   otherstemp.add(0) 
+     *  end
+     * 
+     * FOR i = 0 , i < maxiterations, AND INCREMENTING i BY 1 DO
+         dig1 ASSIGN digits.get(i)
+        dig2 ASSIGN  othertemp.get(i)
+
+        dig1 ASSIGN dig1 - borrow
+        IF dig1 < dig2 THEN
+          dig1 ASSIGN dig1 + 10
+          borrow ASSIGN 1
+        else
+          borrow ASSIGN 0
+          END
+
+        APPEND dig1 - dig2 TO RESULT
+        END
+     * RETURN NEW LARGEINT (result, true) -- turns out i did acutally need to strip it.
+     */

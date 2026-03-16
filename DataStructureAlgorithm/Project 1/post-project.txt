@@ -1,0 +1,32 @@
+1: the most common bug I encountered was leading zeroes. A lot of assumptions i made while writing the code
+ RELIES on the fact that the objects themselves
+do not have any leading zeroes. Therefore, determining that was neccessary to the 
+add(), multiply() compareto() and equals() methods. 
+ This was a PAIN IN THE ASS to debug through. I tried a stripper method after the objects' creation, but 
+the method kept getting removed at compile time, i then tried to figure out why 026 reduced to 
+22 at compile time, which led me to attempt creating a docker because I thought the compiler on my laptop
+was whonky, then I gave up on that and just asked grok about why the java compiler was reducing 026 to 22 
+, and lo and behold... 026 is an int literal. I would have never known otherwise. 
+
+I then discovered rgex stuff, which simplified the stripper which i decided to include with the constructor. However, that broke
+a bunch of methods, because it'd strip away the trailing zeroes, which are actually important, so I overloaded 
+the constructors AGAIN to tell them not to do that. It was a mess, but I managed to get it done. 
+
+the moral of the story is... don't reinvent the wheel dudes. just use the stuff java's already built in instead of 
+needlessly complicating the program with party tricks
+
+2: The existance of zero. Not leading zeroes, zeroes themselves. For the factorial... the multiplication, and the subtraction.
+
+... for the most part, I just explicitly checked for it and then returned the mathematical definition instead of trying to deal 
+with the fact that every time i called a number times zero, it'd start an infinite loop, or return dubious data. 
+
+3: Stackoverflow, geeks4geeks, grok, and w3schools. I consulted with Grok to help me write the pseudocode for 
+the subtraction algoritm, but the thing is. Grok assumed that the number was stored from most important digit to least. 
+so "1234" would be 1234. in my program, it was "4321." It was still usable but I definitly had to 
+change a lot for it to work with the data format I was using. (AS WELL AS INCLUDING EXCEPTION HANDLING 
+AND OTHER MATHEMATICAL DEFINITIONS!)
+
+4: I added the subtraction method. That's about it. 
+
+5. I don't really have any feedback for the project other than this is how you make abstraction feel so satisfying.
+

@@ -1,0 +1,139 @@
+What file do you want to read? graph1.txt
+Vertices: [a, b, c, d, e, f]
+Edges:
+a -> b: 7
+a -> f: 9
+a -> e: 14
+b -> c: 15
+b -> f: 10
+b -> a: 7
+c -> d: 6
+c -> f: 11
+c -> b: 15
+d -> e: 10
+d -> c: 6
+e -> a: 14
+e -> f: 2
+e -> d: 10
+f -> c: 11
+f -> a: 9
+f -> e: 2
+f -> b: 10
+
+Removing vertex a from the priority queue and visiting it.
+
+  Considering edge (u, v) = a -> b
+  Old distance (dist[v]) = 999999
+  New distance (alt = dist[u] + weight(u, v)) = 0 + 7 = 7
+    Updating dist[b] from 999999 to 7 (adding/updating b in the pri queue also).
+    Updating prev[b] from undefined to a.
+
+  Considering edge (u, v) = a -> e
+  Old distance (dist[v]) = 999999
+  New distance (alt = dist[u] + weight(u, v)) = 0 + 14 = 14
+    Updating dist[e] from 999999 to 14 (adding/updating e in the pri queue also).
+    Updating prev[e] from undefined to a.
+
+  Considering edge (u, v) = a -> f
+  Old distance (dist[v]) = 999999
+  New distance (alt = dist[u] + weight(u, v)) = 0 + 9 = 9
+    Updating dist[f] from 999999 to 9 (adding/updating f in the pri queue also).
+    Updating prev[f] from undefined to a.
+
+Removing vertex b from the priority queue and visiting it.
+
+  Considering edge (u, v) = b -> a
+  Old distance (dist[v]) = 0
+  New distance (alt = dist[u] + weight(u, v)) = 7 + 7 = 14
+    No update needed; alt is not less than old distance.
+
+  Considering edge (u, v) = b -> c
+  Old distance (dist[v]) = 999999
+  New distance (alt = dist[u] + weight(u, v)) = 7 + 15 = 22
+    Updating dist[c] from 999999 to 22 (adding/updating c in the pri queue also).
+    Updating prev[c] from undefined to b.
+
+  Considering edge (u, v) = b -> f
+  Old distance (dist[v]) = 9
+  New distance (alt = dist[u] + weight(u, v)) = 7 + 10 = 17
+    No update needed; alt is not less than old distance.
+
+Removing vertex f from the priority queue and visiting it.
+
+  Considering edge (u, v) = f -> a
+  Old distance (dist[v]) = 0
+  New distance (alt = dist[u] + weight(u, v)) = 9 + 9 = 18
+    No update needed; alt is not less than old distance.
+
+  Considering edge (u, v) = f -> b
+  Old distance (dist[v]) = 7
+  New distance (alt = dist[u] + weight(u, v)) = 9 + 10 = 19
+    No update needed; alt is not less than old distance.
+
+  Considering edge (u, v) = f -> c
+  Old distance (dist[v]) = 22
+  New distance (alt = dist[u] + weight(u, v)) = 9 + 11 = 20
+    Updating dist[c] from 22 to 20 (adding/updating c in the pri queue also).
+    Updating prev[c] from b to f.
+
+  Considering edge (u, v) = f -> e
+  Old distance (dist[v]) = 14
+  New distance (alt = dist[u] + weight(u, v)) = 9 + 2 = 11
+    Updating dist[e] from 14 to 11 (adding/updating e in the pri queue also).
+    Updating prev[e] from a to f.
+
+Removing vertex e from the priority queue and visiting it.
+
+  Considering edge (u, v) = e -> a
+  Old distance (dist[v]) = 0
+  New distance (alt = dist[u] + weight(u, v)) = 11 + 14 = 25
+    No update needed; alt is not less than old distance.
+
+  Considering edge (u, v) = e -> d
+  Old distance (dist[v]) = 999999
+  New distance (alt = dist[u] + weight(u, v)) = 11 + 10 = 21
+    Updating dist[d] from 999999 to 21 (adding/updating d in the pri queue also).
+    Updating prev[d] from undefined to e.
+
+  Considering edge (u, v) = e -> f
+  Old distance (dist[v]) = 9
+  New distance (alt = dist[u] + weight(u, v)) = 11 + 2 = 13
+    No update needed; alt is not less than old distance.
+
+Removing vertex c from the priority queue and visiting it.
+
+  Considering edge (u, v) = c -> b
+  Old distance (dist[v]) = 7
+  New distance (alt = dist[u] + weight(u, v)) = 20 + 15 = 35
+    No update needed; alt is not less than old distance.
+
+  Considering edge (u, v) = c -> d
+  Old distance (dist[v]) = 21
+  New distance (alt = dist[u] + weight(u, v)) = 20 + 6 = 26
+    No update needed; alt is not less than old distance.
+
+  Considering edge (u, v) = c -> f
+  Old distance (dist[v]) = 9
+  New distance (alt = dist[u] + weight(u, v)) = 20 + 11 = 31
+    No update needed; alt is not less than old distance.
+
+Removing vertex d from the priority queue and visiting it.
+
+Shortest path is: a f e d 
+Distance is: 21
+
+Final dist map:
+a: 0
+b: 7
+c: 20
+d: 21
+e: 11
+f: 9
+
+Final prev map:
+a: undefined
+b: a
+c: f
+d: e
+e: f
+f: a
