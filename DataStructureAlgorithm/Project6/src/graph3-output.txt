@@ -1,0 +1,113 @@
+What file do you want to read? graph3.txt
+Vertices: [san_francisco, miami, boston, las_vegas, denver, dallas, new_york, seattle, los_angeles, minneapolis, chicago, washington_dc]
+Edges:
+san_francisco -> seattle: 1306
+san_francisco -> los_angeles: 629
+san_francisco -> las_vegas: 919
+miami -> dallas: 2161
+miami -> washington_dc: 1709
+miami -> new_york: 2145
+boston -> new_york: 338
+boston -> chicago: 1613
+boston -> washington_dc: 725
+las_vegas -> dallas: 1983
+las_vegas -> los_angeles: 435
+las_vegas -> denver: 1225
+las_vegas -> san_francisco: 919
+denver -> dallas: 1258
+denver -> las_vegas: 1225
+denver -> seattle: 2161
+denver -> minneapolis: 1483
+dallas -> minneapolis: 1532
+dallas -> denver: 1258
+dallas -> las_vegas: 1983
+dallas -> washington_dc: 2113
+dallas -> miami: 2161
+new_york -> washington_dc: 383
+new_york -> boston: 338
+new_york -> miami: 2145
+seattle -> minneapolis: 2661
+seattle -> denver: 2161
+seattle -> san_francisco: 1306
+los_angeles -> las_vegas: 435
+los_angeles -> san_francisco: 629
+minneapolis -> chicago: 661
+minneapolis -> denver: 1483
+minneapolis -> dallas: 1532
+minneapolis -> seattle: 2661
+chicago -> minneapolis: 661
+chicago -> washington_dc: 1145
+chicago -> boston: 1613
+washington_dc -> dallas: 2113
+washington_dc -> miami: 1709
+washington_dc -> boston: 725
+washington_dc -> new_york: 383
+washington_dc -> chicago: 1145
+
+Visiting vertex los_angeles
+    Updating dist[san_francisco] from 999999 to 629
+    Updating dist[las_vegas] from 999999 to 435
+
+Visiting vertex las_vegas
+    Updating dist[dallas] from 999999 to 2418
+    Updating dist[denver] from 999999 to 1660
+
+Visiting vertex san_francisco
+    Updating dist[seattle] from 999999 to 1935
+
+Visiting vertex denver
+    Updating dist[minneapolis] from 999999 to 3143
+
+Visiting vertex seattle
+
+Visiting vertex dallas
+    Updating dist[miami] from 999999 to 4579
+    Updating dist[washington_dc] from 999999 to 4531
+
+Visiting vertex minneapolis
+    Updating dist[chicago] from 999999 to 3804
+
+Visiting vertex chicago
+    Updating dist[boston] from 999999 to 5417
+
+Visiting vertex washington_dc
+    Updating dist[boston] from 5417 to 5256
+    Updating dist[new_york] from 999999 to 4914
+
+Visiting vertex miami
+
+Visiting vertex new_york
+    Updating dist[boston] from 5256 to 5252
+
+Visiting vertex boston
+
+Shortest path is: los_angeles las_vegas dallas washington_dc new_york boston 
+Distance is: 5252
+
+Final dist map:
+san_francisco: 629
+miami: 4579
+boston: 5252
+las_vegas: 435
+denver: 1660
+dallas: 2418
+new_york: 4914
+seattle: 1935
+los_angeles: 0
+minneapolis: 3143
+chicago: 3804
+washington_dc: 4531
+
+Final prev map:
+san_francisco: los_angeles
+miami: dallas
+boston: new_york
+las_vegas: los_angeles
+denver: las_vegas
+dallas: las_vegas
+new_york: washington_dc
+seattle: san_francisco
+los_angeles: undefined
+minneapolis: denver
+chicago: minneapolis
+washington_dc: dallas

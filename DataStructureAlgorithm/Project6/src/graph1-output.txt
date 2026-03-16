@@ -1,0 +1,59 @@
+What file do you want to read? graph1.txt
+Vertices: [a, b, c, d, e, f]
+Edges:
+a -> b: 7
+a -> f: 9
+a -> e: 14
+b -> c: 15
+b -> f: 10
+b -> a: 7
+c -> d: 6
+c -> f: 11
+c -> b: 15
+d -> e: 10
+d -> c: 6
+e -> a: 14
+e -> f: 2
+e -> d: 10
+f -> c: 11
+f -> a: 9
+f -> e: 2
+f -> b: 10
+
+Visiting vertex a
+    Updating dist[b] from 999999 to 7
+    Updating dist[e] from 999999 to 14
+    Updating dist[f] from 999999 to 9
+
+Visiting vertex b
+    Updating dist[c] from 999999 to 22
+
+Visiting vertex f
+    Updating dist[c] from 22 to 20
+    Updating dist[e] from 14 to 11
+
+Visiting vertex e
+    Updating dist[d] from 999999 to 21
+
+Visiting vertex c
+
+Visiting vertex d
+
+Shortest path is: a f e d 
+Distance is: 21
+
+Final dist map:
+a: 0
+b: 7
+c: 20
+d: 21
+e: 11
+f: 9
+
+Final prev map:
+a: undefined
+b: a
+c: f
+d: e
+e: f
+f: a
