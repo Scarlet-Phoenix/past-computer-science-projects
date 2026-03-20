@@ -1,0 +1,387 @@
+#lang racket
+(require 2htdp/image)
+(require lang/posn)
+(require 2htdp/universe)
+
+;;; 1: Particle Basics
+
+; particle accessors
+(define test-particle (list 100 200 3 -5 60))
+(define (particle-x part)
+  (if (list? part)
+      (list-ref part 0)
+      part))
+(define (particle-y part)
+  (if (list? part)
+      (list-ref part 1)
+      part))
+(define (particle-vx part)
+  (if (list? part)
+      (list-ref part 2)
+      part))
+(define (particle-vy part)
+  (if (list? part)
+      (list-ref part 3)
+      part))
+(define (particle-life part)
+  (if (list? part)
+      (list-ref part 4)
+      part))
+;(particle-x test-particle)     ; => 100
+;(particle-y test-particle)     ; => 200
+;(particle-vx test-particle)    ; => 3
+;(particle-vy test-particle)    ; => -5
+(particle-life test-particle)  ; => 60
+
+; tests
+
+
+; make-particle
+
+(define (make-particle x y dx dy hp)
+  (list x y dx dy hp))
+;(make-particle 50 100 2 -3 30)
+
+
+; tests
+
+
+
+; update-particle
+
+; tests
+(define (update-particle part)
+  (make-particle (+ (particle-x part) (particle-vx part))
+                  (+ (particle-y part) (particle-vy part))
+                  (particle-vx part) (particle-vy part) (- (particle-life part) 1)))
+; particle-alive?
+
+(define (particle-alive part)
+  (> (particle-life part) 0))
+
+; tests
+
+
+; draw-particle
+(define (draw-particle part bg)
+  (let* ([fix-alpha (if (<= (particle-life part) 50)
+                        (- 255 (* 5 (- 50 (particle-life part))))
+                        255)])
+   ; (overlay (circle 10 "solid" (color 255 0 0 fix-alpha))
+    ;         bg)))
+    (place-image (circle 10 "solid" (color 255 0 0  (floor fix-alpha))) (particle-x part) (particle-y part) bg)))
+; tests
+;(define bg (rectangle 400 400 "solid" "gray"))
+;(draw-particle (list 200 200 0 0 60) bg)  ; draws a bright particle
+;(draw-particle (list 20 200 0 0 45) bg)  ; draws a faded particle
+
+; 2: Closures
+
+; make-spawner
+
+
+(define (make-spawner x y v-min v-max life)
+  ;; Returns a function that creates particles at (x, y)
+  ;; with random x and y velocities between speed-min and speed-max
+  ;; and the given lifetime
+  (lambda (x y) (make-particle x y (random v-min v-max) (random v-min v-max) life)))
+
+; tests
+;(define fountain (make-spawner 200 300 1 5 60))
+;(particle-vx (fountain 23 99))  ; => a particle at (200, 300) with random velocity, life=60
+;(particle-vx (fountain 11 221))  ; => another particle (different random velocity)
+
+
+; make-gravity
+(define (make-gravity str)
+  (lambda (part) (make-particle (particle-x part) (particle-y part) (+ (particle-vx part) 0) (+ (particle-vy part) str) (particle-life part))))
+; tests
+
+
+
+;(define earth-gravity (make-gravity 0.5))
+;(define moon-gravity (make-gravity 0.08))
+
+;(define p (list 100 100 0 0 60))
+;(earth-gravity p)  ; => (list 100 100 0 0.5 60)  ; vy increased, positive y is "down"
+;(moon-gravity p)   ; => (list 100 100 0 0.08 60) ; less increase
+
+; make-wind
+(define (make-wind dx dy)
+  (lambda (part) (make-particle (particle-x part) (particle-y part) (+ (particle-vx part) dx) (+ (particle-vy part) dy) (particle-life part))))
+;(define gentle-breeze (make-wind 0.1 0))
+;(define updraft (make-wind 0 -0.3))
+
+;(define p1 (list 100 100 0 0 60))
+;(gentle-breeze p1)  ; => (list 100 100 0.1 0 60)
+;(updraft p1)        ; => (list 100 100 0 -0.3 60)
+
+; make-friction
+
+(define (make-friction coeff)
+  (lambda (part) (make-particle (particle-x part) (particle-y part) (* (particle-vx part) coeff) (* (particle-vy part) coeff) (particle-life part))))
+
+
+; tests
+;(define air-resistance (make-friction 0.98))
+;(define heavy-friction (make-friction 0.8))
+
+;(define p2 (list 100 100 10 10 60))
+;(air-resistance p2)   ; => (list 100 100 9.8 9.8 60)
+;(heavy-friction p2)   ; => (list 100 100 8 8 60)
+
+; make-attractor
+
+; tests
+(define (make-attractor ax ay strength)
+  (lambda (part)
+    (let*([resx (- (particle-x part) ax)]
+          [resy (- (particle-y part) ay)]
+          [opx (cond
+                 [(zero? resx) (lambda (i) i)]
+                 [(positive? resx) (lambda (i) (- i strength))]
+                 [(not(positive? resx)) (lambda (i) (+ i strength))])]
+          [opy (cond
+                 [(zero? resy) (lambda (i) i)]
+                 [(positive? resy) (lambda (i) (- i strength))]
+                 [(not(positive? resy)) (lambda(i) (+ i strength))])])
+                   ;  [(zero? resy) (lambda (i) (i))])])
+      (make-particle (particle-x part) (particle-y part) (opx (particle-vx part)) (opy (particle-vy part)) (particle-life part)))))
+
+;(define black-hole (make-attractor 200 200 0.1))
+
+;(define p3 (list 100 200 0 0 60))  ; to the left of attractor
+;(black-hole p3)  ; => particle with positive vx (pulled right)
+
+;(define p4 (list 200 100 0 0 60))  ; above attractor
+;(black-hole p4)  ; => particle with positive vy (pulled down)
+
+;(define p5 (list 300 400 0 0 60)) 
+;(black-hole p5)  
+
+
+;(define p6 (list 200 200 0 0 60))  
+;(black-hole p6)
+         
+(define (compose-forces . args)
+  (lambda (part) (foldl (lambda (f p)
+                          ;(display p)
+                          (f p)) part args)))
+
+;foldr applies them in the incorrect order
+; compose-forces
+
+; tests
+(define physics (compose-forces
+                  (make-gravity 1.0)
+                  (make-wind 1.0 1.0)
+                  (make-friction 0.5)))
+
+;(define p5 (list 100 100 10 0 60))
+;(physics p5)
+;'(100 100 5.5 1.0 60)
+
+; 3: Tail Recursion
+
+; update-all-particles
+(define (update-all-particles lst)
+  (define (helper lst)
+    (if (null? lst) '()
+        (cons (update-particle (car lst)) (helper (cdr lst)))))
+  (helper lst))
+
+;(define particles (list '(0 0 1 1 10) '(5 5 -1 2 20) '(100 0 -100 -100 1)))
+;(update-all-particles particles)
+        ; => (list (list 1 1 1 1 9) (list 4 7 -1 2 19) (list 0 -100 -100 -100 0))
+ 
+
+
+; apply-force-to-all
+
+
+(define (apply-force-to-all arg lst)
+  (define (helper f lst)
+    (if (null? lst) '()
+        (cons (f (car lst)) (helper f (cdr lst)))))
+  (helper arg lst))
+
+
+; tests
+;(apply-force-to-all physics particles)
+
+; filter-alive
+
+(define (filter-alive lst)
+  (define (helper lst)
+    (if (null? lst)
+        '()
+        (cons
+         (if (particle-alive (car lst))
+             (car lst)
+             '())
+         (helper (cdr lst)))))
+  (filter-not null? (helper lst)))
+
+
+; tests
+;(define particles2 (list
+  ;(list 0 0 0 0 5)   ; alive
+  ;(list 1 1 0 0 0)   ; dead
+  ;(list 2 2 0 0 -1)  ; dead
+ ; (list 3 3 0 0 10))); alive
+;(filter-alive particles2)
+
+; draw-all-particles
+
+(define (draw-all-particles lst bg)
+  (define (helper lst bg)
+    ;(display "called helper\n")
+    (if (null? (cdr lst))
+        (draw-particle (car lst) bg)
+        (draw-particle (car lst) (helper (cdr lst) bg))))
+  ;(draw-all-particles lst bg))
+  (if (null? lst)
+      bg
+      (helper lst bg)))
+
+(define bg (rectangle 400 400 "solid" "blue"))
+;(draw-all-particles '((50 50 0 0 100) (200 200 0 0 20) (100 150 0 0 30)) bg) ; assumes bg is defined earlier
+; make sure the lifetimes are big enough to have high opacity!
+; => image with all particles drawn
+; tests
+
+
+; 4: Simulation!
+
+; simulation-step
+(define (simulation-step particles forces)
+  (let* ([phys-app (apply-force-to-all forces particles)]
+         [updated-app (update-all-particles phys-app)]
+         [live-part (filter-alive updated-app)])
+    live-part))
+
+(define (corou-spawn spawn-rate spawner)
+         (define (helper acc)
+           (if (= acc spawn-rate)
+               spawner
+               (cons spawner (helper (+ acc 1)))))
+           (helper 0))
+         
+;CALLER MUST SPECFIFY THE SPAWNER LOCATION
+(define (simulation-step-with-spawning particles forces spawner spawn-rate)
+  (let* (
+         [additional-parts (append particles (corou-spawn spawn-rate spawner))])
+    (simulation-step additional-parts forces)))
+         
+
+
+     
+; simulation-step-with-spawning
+
+
+; run-simulation
+(define WIDTH 400)
+(define HEIGHT 400)
+
+(define my-spawner (make-spawner 200 350 -8 -2 30))
+(define my-forces (compose-forces (make-gravity 0.03) (make-friction 0.9)))
+
+;(define (tick-handler particles)
+;  (if (null? particles)
+;      (simulation-step-with-spawning particles my-forces (my-spawner 10 10) 3)
+;      (simulation-step-with-spawning particles my-forces (my-spawner (particle-x (car particles)) (particle-y (car particles))) 3)))
+
+
+
+(define (tick-handler particles)
+  (simulation-step-with-spawning particles my-forces (my-spawner 400 400) 13))
+
+
+(define (draw-handler particles)
+  (draw-all-particles particles (rectangle WIDTH HEIGHT "solid" "black")))
+
+(big-bang '()  ; initial state: no particles;
+  [on-tick tick-handler]
+  [to-draw draw-handler])
+
+; 5: Your Scene!
+
+;(require racket/random)
+;(define WIDTH 800)
+;(define HEIGHT 800)
+
+
+;(define (change-color c dc))
+ 
+
+;; My Scene: I got extensive help from Claude AI.
+;;; even so, the vast majority of this code is my own.
+;;; I used Claude for guidance, hints, and debugging.
+
+;(require racket/random)
+;(define WIDTH 800)
+;(define HEIGHT 800)
+;
+;(define (make-random-spawner x y v-min v-max life images)
+;  (lambda () (make-particle x y (random v-min v-max) (random v-min v-max) life (car (random-sample images 1)))))
+;
+;(define shape-makers
+;  (list
+;   (lambda (a) (circle 5 "solid" (color 0 255 0 a)))
+;   (lambda (a) (star 10 "solid" (color 255 255 0 a)))
+;   (lambda (a) (rectangle 10 10 "solid" (color 255 0 0 a)))))
+;
+;(define my-spawner (curryr make-random-spawner -5 5 80 shape-makers))
+;
+;  
+;(define my-forces (compose-forces (make-gravity 0.3) (make-friction 0.90)))
+;
+;(define (tick-handler state)
+;  (list (simulation-step-with-spawning (first state)
+;                                       (apply compose-forces (fourth state))
+;                                       (my-spawner (second state) (third state)) ; move the spawner according to the state
+;                                       5)
+;        (second state)
+;        (third state)
+;        (fourth state)))
+;
+;
+;
+;(define (draw-handler state)
+;  (draw-all-particles (first state) (rectangle WIDTH HEIGHT "solid" "black")))
+;
+;(define (normalize p)
+;  (let ((magnitude (sqrt (+ (expt (car p) 2) (expt (cdr p) 2)))))
+;    (if (zero? magnitude)
+;        (cons 0 0)
+;        (cons (/ (car p) magnitude) (/ (cdr p) magnitude)))))
+;
+;(define (make-repeller x y size)
+;  (lambda (p)
+;    ; calculate the direction from x, y to the particle
+;    ; normalize
+;    ; push the particle by the normalized * size
+;    (let* ((direction (cons (- (particle-x p) x) (- (particle-y p) y)))
+;           (normalized (normalize direction)))
+;      (make-particle (particle-x p)
+;                     (particle-y p)
+;                     (+ (particle-vx p) (* (car normalized) size))
+;                     (+ (particle-vy p) (* (cdr normalized) size))
+;                     (particle-life p)
+;                     (particle-image p)))))
+;           
+;(define (mouse-handler state x y event)
+;  (let ((repeller (make-repeller x y 1)))
+;    (cond
+;      ((equal? event "button-down")
+;       (list (first state) x y (cons repeller (fourth state))))
+;      ((equal? event "button-up")
+;       (list (first state) x y (cdr (fourth state))))
+;      (else
+;       (list (first state) x y (fourth state))))))
+;  
+;
+;(big-bang (list '() 0 0 (list my-forces))  ; initial state: no particles
+;  [on-tick tick-handler]
+;  [to-draw draw-handler]
+;  [on-mouse mouse-handler])

@@ -1,0 +1,320 @@
+#lang racket
+(require 2htdp/image)
+(require lang/posn)
+
+;;; Provided Helpers:
+
+;; draw-polygon: list of points (pairs), mode ("solid" or "outline"), color -> image
+;; Draws a polygon using a list of (cons x y) points
+(define (draw-polygon image points mode color)
+  (add-polygon image (map (lambda (p) (make-posn (car p) (cdr p))) points)
+               mode
+               color))
+
+;; Turtle Helpers
+;; Constructor (provided)
+(define (make-turtle x y angle) (list x y angle))
+
+;; Accessors
+(define (turtle-x t) (car t))
+(define (turtle-y t) (cadr t))
+(define (turtle-angle t) (caddr t))
+
+;; Movement
+(define (turtle-forward t distance)
+  (make-turtle (+ (turtle-x t) (* distance (cos (turtle-angle t))))
+               (+ (turtle-y t) (* distance (sin (turtle-angle t))))
+               (turtle-angle t)))
+
+(define (turtle-turn t angle)
+  (make-turtle (turtle-x t)
+               (turtle-y t)
+               (+ (turtle-angle t) angle)))
+
+(define (turtle-point t)
+  (cons (car t) (cadr t)))
+
+;;; Part 1:
+
+; midpoint
+
+(define (midpoint first second)
+  (cons (/ (+ (car first) (car second)) 2) (/ (+ (cdr first) (cdr second)) 2)))
+
+; tests
+;(midpoint (cons 0 0) (cons 100 100))
+;(midpoint (cons 0 0) (cons 50 0))
+;(midpoint (cons -10 -10) (cons 10 10))
+;(midpoint (cons 0 0) (cons 0 80))
+
+; point-at-fraction
+
+(define (point-at-fraction p1 p2 t)
+  (cons (* (+ (car p1) t) (- (car p2) (car p1))) (* (+ (cdr p1) t ) (- (cdr p2) (cdr p1)))))
+  
+    
+;result = p1 + t * (p2 - p1) for x and y
+; tests
+;(point-at-fraction (cons 0 0) (cons 100 0) 0.25)
+;(point-at-fraction (cons 0 0) (cons 100 0) 0.5)
+
+; rotate-point
+
+;(define (test-func)
+ ; (let ([x (+ 4 5)]) x))
+;(test-func)
+
+
+(define (translate-point point origin)
+  (cons (- (car origin) (car point)) (- (cdr origin) (cdr point))))
+;(define (translate-back point origin)
+ ; (cons (+ (car origin) (car point)) (+ (cdr origin) (cdr point))))
+
+(define (rotate-point point origin rot)
+  (let* ([t-point (translate-point point origin)]
+         [rotated-x (- (* (car t-point) (cos rot)) (* (cdr t-point) (sin rot)))]
+         [rotated-y (+ (* (car t-point) (sin rot)) (* (cdr t-point) (cos rot)))])
+    (translate-point (cons rotated-x rotated-y) origin)))
+    
+
+
+
+
+
+
+;    Translate the point so the center is at the origin
+;   Apply rotation: x' = x*cos(angle) - y*sin(angle), y' = x*sin(angle) + y*cos(angle)
+;  Translate back
+
+; tests
+;"90- degree rots" 
+; 90-degree rotations around origin
+;(rotate-point (cons 1 0) (cons 0 0) (/ pi 2))     ; => (cons 0.0 1.0) approximately
+;(rotate-point (cons 1 0) (cons 0 0) pi)           ; => (cons -1.0 0.0) approximately
+;(rotate-point (cons 1 0) (cons 0 0) (* 3/2 pi))   ; => (cons 0.0 -1.0) approximately
+;(rotate-point (cons 0 1) (cons 0 0) (/ pi 2))     ; => (cons -1.0 0.0) approximately
+;"Larger rads" 
+; Larger radius
+;(rotate-point (cons 5 0) (cons 0 0) (/ pi 2))     ; => (cons 0.0 5.0) approximately
+;(rotate-point (cons 10 0) (cons 0 0) pi)          ; => (cons -10.0 0.0) approximately
+
+; Rotate around a different center
+;(rotate-point (cons 2 0) (cons 1 0) (/ pi 2))     ; => (cons 1.0 1.0) approximately
+;(rotate-point (cons 3 1) (cons 1 1) pi)           ; => (cons -1.0 1.0) approximately
+;(rotate-point (cons 10 5) (cons 5 5) (/ pi 2))    ; => (cons 5.0 10.0) approximately
+;(rotate-point (cons 6 4) (cons 4 4) (/ pi 2))     ; => (cons 4.0 6.0) approximately
+
+; 60-degree rotation (important for Koch curve!)
+;(rotate-point (cons 1 0) (cons 0 0) (/ pi 3))     ; => (cons 0.5 0.866) approximately
+;(rotate-point (cons 1 0) (cons 0 0) (- (/ pi 3))) ; => (cons 0.5 -0.866) approximately
+
+; draw-line
+
+
+;draw-line is already a function in racket's libraries
+(define (draw-line point1 point2 color background)
+  (add-line background (car point1) (cdr point1) (car point2) (cdr point2) color))
+;(draw-line (cons 0 0) (cons 100 100) "black" (rectangle 200 200 "solid" "white"))
+;(draw-line (cons 50 0) (cons 50 100) "red" (rectangle 100 100 "solid" "white"))
+;(draw-line (cons 0 50) (cons 100 50) "blue" (rectangle 100 100 "solid" "white"))
+;(draw-line (cons 10 10) (cons 90 90) "green" (rectangle 100 100 "solid" "gray"))
+  
+
+; tests
+
+
+;;; Part 2: Fractals
+
+; sierpinski
+
+;(define (serpenski n)
+ ; (if (zero? n)
+  ;    (triangle 10 "solid" "red")
+   ;   (freeze (above (serpenski (- n 1))(beside (serpenski (- n 1)) (serpenski (- n 1)))))))
+
+;(define (serpenskis-triange p1 p2 p3 depth)
+  ;(overlay (serpenski-rec-helper p1 p2 p3 depth)
+ ;          (rectangle 200 200 "solid" "black")))
+
+;(define (serpenski-rec-helper p1 p2 p3 depth img)
+ ; (if (zero? depth)
+ ;     (triangle 10 "solid" "red")
+  ;    (serpenski-rec-helper p1 (midpoint p2 p1) (midpoint p3 p1) (- depth 1)
+   ;                         (serpenski-rec-helper (midpoint p1 p2) p2 (midpoint p3 p2) (- depth 1)
+    ;(serpenski-rec-helper (midpoint p1 p3) (midpoint p2 p3) p3 (- depth 1)
+;(define (draw-polygon image points mode color)
+;(define (serpenski-rec-helper p1 p2 p3 depth img)
+ ;(if (= depth 0)
+  ;   (draw-polygon img (list p1 p2 p3) "solid" "red")
+   ;  (three-triangles p1 p2 p3 depth img))
+  ;(serpenski-rec-helper p1 p2 p3 depth img))
+
+
+
+;(define (three-triangles p1 p2 p3 depth img)
+ ; (let* ((t1 (serpenski-rec-helper p3 (midpoint p3 p1) (midpoint p2 p3) (- depth 1) image))
+   ;            (t2 (serpenski-rec-helper p2 (midpoint p1 p2) (midpoint p2 p3) (- depth 1) t1))
+  ;             (t3 (serpenski-rec-helper p1 (midpoint p1 p2) (midpoint p3 p1) (- depth 1) t2))
+     ;          )
+    ;      t3))
+
+
+
+; Koch curve
+(define (koch p1 p2 depth img)
+  (if (zero? depth)
+      (draw-line p1 p2 "black" img)
+      (let* ([a (point-at-fraction p1 p2 1/3)]
+             [b (point-at-fraction p1 p2 2/3)]
+             [peak (rotate-point a b (- (/ pi 3)))])
+        (koch p1 a (- depth 1)
+              (koch a peak (- depth 1)
+                    (koch peak b (- depth 1)
+                          (koch b p2 (- depth 1) img)))))))
+      
+
+
+;(koch (cons 0 11) (cons 320 250) 1 (rectangle 300 300 "solid" "orange"))
+
+
+
+
+; test
+
+
+; Koch snowflake
+
+(define (koch-snowflake center size depth)
+  (let* ([p1 (cons (car center) (- (cdr center) size))]
+         [p2 (rotate-point p1 center (/ (* pi 2) 3))]
+         [p3 (rotate-point p1 center (/ (* pi 4) 3))]
+         [back (rectangle (* 3 size) (* 3 size) "solid" "orange")])
+    (koch p1 p2 depth
+          (koch p2 p3 depth
+                (koch p3 p1 depth back)))))
+
+
+; test
+(koch-snowflake (cons 100 100) 100 5)
+
+;;; Part 3: L-systems w/ Turtle Graphics
+
+; apply-rule
+
+; test
+
+
+; l-system-step
+
+; test
+
+
+; l-system-generate
+
+; test
+
+
+; interpret-l-system
+
+; test
+
+
+; L-system Examples
+
+; Sierpinski
+
+
+; Plant
+
+
+; Dragon
+
+
+;;; Part 5: Come up with your own fractal!
+
+;; Fatou Set: I used AI to give me a few steps,
+;; including function definitions (but no code) to
+;; get this working. I am happy to show you my prompts
+;; if you are curious.
+
+(define (escape-count f z max-iter)
+  (define (go z acc)
+    (if (or (> (magnitude z) 2) (>= acc max-iter))
+        acc
+        (go (f z) (+ 1 acc))))
+  (go z 0))
+
+(define c -0.5125+0.5213i)
+(define z 0.5+0.2i)
+(escape-count (lambda (z) (+ (* z z) c)) z 10)
+
+;; function checked for correctness with AI
+;; (coordinate mapping is hard! AI caught an
+;;  error regarding the flipped y-axis for
+;;  graphics)
+(define (pixel->complex px py
+                        width height
+                        x-min x-max
+                        y-min y-max)
+  ;; Map pixel (px, py) to complex number
+  ;; px=0 -> x-min, px=width -> x-max (similarly for y)]
+  (let ((x (+ (* (/ px width) (- x-max x-min)) x-min))
+        (y (- y-max (* (/ py height) (- y-max y-min)))))
+    (+ x (* y +i))
+    ))
+(pixel->complex 20 70 100 100 -1.5 1.5 -1.5 1.5)
+
+;; returns a color, darkened based on how many iterations it takes to "escape"
+;; or another color if the point never escapes
+(define (iteration->color n max-iter)
+  (define (darker color-list by) ; recycling darker from Project 1
+    (make-color (floor (* (car by) (car color-list))) ; R
+                (floor (* (car (cdr by)) (car (cdr color-list)))) ; G
+                (floor (* (car (cdr (cdr by))) (car (cdr (cdr color-list))))))) ; B
+  (if (= n max-iter)
+      (make-color 0 255 0)
+      (let ((scale (expt (/ n max-iter) 0.3)))
+        (darker '(0 0 255) (list scale scale scale)))))
+
+(define (draw-fatou f max-iter width height)
+  ;; for every pixel in width x height
+  ;; calculate its complex coordinate
+  ;; then compute its escape-count
+  ;; then create its color
+  ;; then color the pixel accordingly
+  (define (make-image curr-y)
+    (if (= curr-y height)
+        (make-row 0 curr-y)
+        (above (make-row 0 curr-y) (make-image (+ 1 curr-y)))
+        ))
+  (define (make-row x y)
+    (let* ((z (pixel->complex x y width height -1.5 1.5 -1.5 1.5))
+           (count (escape-count f z max-iter))
+           (color (iteration->color count max-iter)))
+      (if (= x width)
+          (rectangle 1 1 "solid" color)
+          (beside (rectangle 1 1 "solid" color) (make-row (+ x 1) y)))))
+  (make-image 0))
+
+(define (draw-fatou-tr f max-iter width height)
+    (define (make-row x y acc)
+      (if (>= x width)
+          acc
+          (let* ((z (pixel->complex x y width height -1.5 1.5 -1.5 1.5))
+                 (count (escape-count f z max-iter))
+                 (color (iteration->color count max-iter)))
+            (make-row (+ x 1) y (beside acc (rectangle 1 1 "solid" color))))))
+
+    (define (make-image curr-y acc)
+      (if (>= curr-y height)
+          acc
+          (make-image (+ 1 curr-y) (above acc (make-row 0 curr-y empty-image)))))
+
+    (make-image 0 empty-image))
+
+;; To produce different images, either:
+;; - modify the lambda expression
+;; - increase/decrease the max-iter (2nd argument)
+;; - increase/decrease the resolution (last 2 arguments)
+;(draw-fatou (lambda (z) (+ (* z z) c)) 50 400 400)
+(draw-fatou-tr (lambda (z) (+ (* z z) c)) 70 800 800) 
